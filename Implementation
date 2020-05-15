@@ -523,3 +523,4 @@ schoolscores.TestTakers = score.TestTakers
 INNER JOIN years ON years.year=schoolscores.year
 
 SET score.yearsId = years.yearId
+
