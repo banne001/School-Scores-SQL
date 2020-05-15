@@ -1,0 +1,525 @@
+Table for original database
+
+CREATE TABLE schoolscores (
+
+id int(4) NULL NULL PRIMARY KEY AUTO_INCREMENT,
+
+year year,
+
+staeCode char(2),
+
+state varchar(30),
+
+AveMath int(3),
+
+AveVerbal int(3),
+
+TestTakers int(7),
+
+AcaArtGPA decimal(3,2),AcaArtYear decimal(3,2),
+
+AcaEngGPA decimal(3,2),AcaEngYear decimal(3,2),
+
+AcaForeignGPA decimal(3,2), AcaForeignYear decimal(3,2),
+
+AcaMathGPA decimal(3,2),AcaMathYear decimal(3,2),
+
+AcaNatGPA decimal(3,2)AcaNatYear decimal(3,2),
+
+AcaSocGPA decimal(3,2),AcaSocYear decimal(3,2),
+
+fi2M int(3),fi2t int(5),fi2v int(3),
+
+fi4M int(3),fi4t int(5),fi4v int(3),
+
+fi6M int(3),fi6t int(5),fi6v int(3),
+
+fi8M int(3),fi8t int(5),fi8v int(3),
+
+fi0M int(3),fi0t int(5),fi0v int(3),
+
+fi1M int(3),fi1t int(5),fi1v int(3),
+
+gpa_amM int(3),gpa_amT int(5),gpa_amV int(3),
+
+gpa_apM int(3),gpa_apT int(5),gpa_apV int(3),
+
+gpa_aM int(3),gpa_aT int(5),gpa_aV int(3),
+
+gpa_bM int(3),gpa_bT int(5),gpa_bV int(3),
+
+gpa_cM int(3),gpa_cT int(5),gpa_cV int(3),
+
+gpa_dM int(3),gpa_dT int(5),gpa_dV int(3),
+
+gpa_nM int(3),gpa_nT int(5),gpa_nV int(3),
+
+genderFM int(3),genderFT int(5),genderFV int(3),
+
+genderMM int(3),genderMT int(5),genderMV int(3),
+
+scr2MF int(4),scr2MM int(4),scr2MT int(4),
+
+scr2vF int(4),scr2vM int(4),scr2vT int(4),
+
+scr3MF int(4),scr3MM int(4),scr3MT int(4),
+
+scr3vF int(4),scr3vM int(4),scr3vT int(4),
+
+scr4MF int(4),scr4MM int(4),scr4MT int(4),
+
+scr4vF int(4),scr4vM int(4),scr4vT int(4),
+
+scr5MF int(4),scr5MM int(4),scr5MT int(4),
+
+scr5vF int(4),scr5vM int(4),scr5vT int(4),
+
+scr6MF int(4),scr6MM int(4),scr6MT int(4),
+
+scr6vF int(4),scr6vM int(4),scr6vT int(4),
+
+scr7MF int(4),scr7MM int(4),scr7MT int(4),
+
+scr7vF int(4),scr7vM int(4),scr7vT int(4)
+
+)
+
+7 look-up tables
+
+--------------------------------------------------------------------------
+
+CREATE TABLE states (
+
+stateCode char(2) NOT NULL PRIMARY KEY,
+
+state varchar(30)
+
+)
+
+INSERT INTO states (states.stateCode, states.state) SELECT DISTINCT schoolscores.staeCode, schoolscores.state FROM schoolscores
+
+--------------------------------------------------------------------------
+
+CREATE TABLE years(
+
+yearId int(2) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+year year
+
+)
+
+INSERT INTO years (year) SELECT DISTINCT schoolscores.year FROM schoolscores
+
+--------------------------------------------------------------------------
+
+CREATE TABLE types(
+
+typeId int(2) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+type VARCHAR(10)
+
+)
+
+INSERT INTO types(type) VALUES ("Math"), ("Verbal"), ("Test-Takers")
+
+--------------------------------------------------------------------------CREATE TABLE family_income_range(
+
+fiid int(1) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+min int(3),
+
+max int(3)
+
+)
+
+INSERT INTO family_income_range (min, max) VALUES (0,20),(20,40),(40,60),(60,80), (80,100), (100,999)
+
+--------------------------------------------------------------------------
+
+CREATE TABLE gpas(
+
+gpaid int(1) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+gpa char(15)
+
+)
+
+INSERT INTO gpas(gpa) VALUES ("A+"), ("A"), ("A-"),("B"),("C"),("D or Lower"), ("No response")
+
+--------------------------------------------------------------------------
+
+CREATE TABLE score_range(
+
+srid int(1) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+min int(3),
+
+max int(3)
+
+)
+
+INSERT INTO score_range (min, max) VALUES (200,300),(300,400),(400,500),(500,600),(600,700), (700,800)
+
+--------------------------------------------------------------------------
+
+CREATE TABLE subjects(
+
+subid int(1) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+subject varchar(30)
+
+)
+
+INSERT INTO subjects (subject) VALUES
+
+("Arts/Music"),("English"),("Foreign Language"),("Mathematics"),("Natural Science"),("Social Science")
+
+--------------------------------------------------------------------------
+
+6 Linking tables
+
+Only included one insert-update statement to reduce pages. To insert more data from the original table, change the where clause and the column name from schoolscores
+
+(e.g.
+
+INSERT ...
+
+where fiid = 1 AND typeid = 1;
+
+UPDATE ...
+
+SET Fam_income_scores.score = schoolscores.fi0M
+
+where fiid = 1 AND typeid = 1 ;
+
+to
+
+INSERT ...
+
+where fiid = 4 AND typeid = 3;
+
+...
+
+UPDATE ...
+
+SET Fam_income_scores.score = schoolscores.fi6T
+
+where fiid = 4 AND typeid = 3 ;
+
+)
+
+--------------------------------------------------------------------------
+
+CREATE TABLE Fam_income_scores(
+
+scoreId int(3),
+
+fiid int(1),
+
+typeId int(2),
+
+score int(7),
+
+FOREIGN KEY (scoreId) REFERENCES score(scoreId),
+
+FOREIGN KEY (typeId) REFERENCES types(typeId),
+
+FOREIGN KEY (fiid) REFERENCES family_income_range(fiid),
+
+PRIMARY KEY (scoreId, fiid, typeid)
+
+)
+
+INSERT INTO Fam_income_scores (scoreid, fiid, typeId)
+
+SELECT DISTINCT score.scoreId, family_income_range.fiid, types.typeId
+
+FROM score, family_income_range, types
+
+where fiid = 1 AND typeid = 1
+
+ORDER BY `score`.`scoreId` ASC;
+
+UPDATE Fam_income_scores
+
+INNER JOIN score ON
+
+score.scoreId=Fam_income_scores.scoreId
+
+INNER JOIN years ON
+
+years.yearId = score.yearsId
+
+INNER JOIN schoolscores ON
+
+score.stateCode = schoolscores.staeCode AND
+
+years.year = schoolscores.year
+
+SET Fam_income_scores.score = schoolscores.fi0M
+
+where fiid = 1 AND typeid = 1;
+
+...
+
+--------------------------------------------------------------------------
+
+CREATE TABLE gpa_scores(
+
+scoreId int(3),
+
+gpaid int(1),
+
+typeId int(2),
+
+score int(7),
+
+FOREIGN KEY (scoreId) REFERENCES score(scoreId),
+
+FOREIGN KEY (gpaId) REFERENCES gpas(gpaId),
+
+FOREIGN KEY (typeid) REFERENCES types(typeId),
+
+PRIMARY KEY (scoreId, gpaid, typeid)
+
+)
+
+INSERT gpa_scores(scoreId, gpaid, typeid)
+
+SELECT DISTINCT score.scoreId, gpas.gpaid, types.typeId
+
+FROM score, gpas, types
+
+WHERE gpaid = 1 and typeid = 1;
+
+UPDATE gpa_scores
+
+INNER JOIN score ON
+
+score.scoreId=gpa_scores.scoreId
+
+INNER JOIN years ON
+
+years.yearId = score.yearsId
+
+INNER JOIN schoolscores ON
+
+score.stateCode = schoolscores.staeCode AND
+
+years.year = schoolscores.year
+
+SET gpa_scores.score = schoolscores.gpa_apM
+
+WHERE gpaid = 1 and typeid = 1;
+
+...
+
+--------------------------------------------------------------------------
+
+CREATE TABLE score_range_students(
+
+scoreId int(3),
+
+srid int(1),
+
+typeid int(2),
+
+gender varchar(10),
+
+students int(5),
+
+FOREIGN KEY (scoreId) REFERENCES score(scoreId),
+
+FOREIGN KEY (srid) REFERENCES score_range(srid),
+
+FOREIGN KEY (typeid) REFERENCES types(typeid),
+
+PRIMARY key (scoreid, srid, typeid, gender)
+
+)
+
+INSERT INTO score_range_students(scoreId, srid, typeid, gender)
+
+SELECT DISTINCT score.scoreId, score_range.srid, types.typeId, gender_scores.gender
+
+FROM score, score_range, types, gender_scores
+
+WHERE score_range.srid = 1 and types.typeId = 1 and gender_scores.gender = "Female"
+
+ORDER BY `score`.`scoreId` ASC;
+
+UPDATE score_range_students
+
+INNER JOIN score ON
+
+score.scoreId=score_range_students.scoreId
+
+INNER JOIN years ON
+
+years.yearId = score.yearsId
+
+INNER JOIN schoolscores ON
+
+score.stateCode = schoolscores.staeCode AND
+
+years.year = schoolscores.year
+
+SET score_range_students.students = schoolscores.scr2MF
+
+WHERE srid = 1 and typeId = 1 and gender = "Female";
+
+...
+
+--------------------------------------------------------------------------
+
+CREATE TABLE gender_scores(
+
+scoreId int(3),
+
+gender varchar(6),
+
+typeId int(2),
+
+score int(5),
+
+PRIMARY KEY (scoreId,typeId,gender),
+
+FOREIGN KEY (scoreId) REFERENCES score(scoreId),
+
+FOREIGN KEY (typeId) REFERENCES types(typeId)
+
+)
+
+INSERT INTO gender_scores(scoreId, typeid, gender)
+
+SELECT DISTINCT score.scoreId, types.typeId, score_range_students.gender
+
+FROM score, types, score_range_students
+
+WHERE types.typeId = 1 and score_range_students.gender = "Male"
+
+ORDER BY `score`.`scoreId` ASC;
+
+UPDATE gender_scores
+
+INNER JOIN score ON
+
+score.scoreId=gender_scores.scoreId
+
+INNER JOIN years ON
+
+years.yearId = score.yearsId
+
+INNER JOIN schoolscores ON
+
+score.stateCode = schoolscores.staeCode AND
+
+years.year = schoolscores.year
+
+SET gender_scores.score = schoolscores.genderMM
+
+WHERE typeId = 1 and gender = "Male";
+
+...
+
+--------------------------------------------------------------------------
+
+CREATE TABLE subject_averages(
+
+scoreId int(3),
+
+subid int(1),
+
+aveGPA decimal(4,2),
+
+aveYear decimal(4,2),
+
+FOREIGN KEY (scoreId) REFERENCES score(scoreId),
+
+FOREIGN KEY (subId) REFERENCES subjects(subId),
+
+PRIMARY KEY (scoreId, subid)
+
+)
+
+INSERT INTO subject_averages(scoreId, subid)
+
+SELECT DISTINCT score.scoreId, subjects.subid
+
+FROM score, subjects
+
+WHERE subjects.subid = 1;
+
+UPDATE subject_averages
+
+INNER JOIN schoolscores ON
+
+subject_averages.aveGPA=schoolscores.AcaArtGPA AND
+
+subject_averages.aveYear=schoolscores.AcaArtYear
+
+INNER JOIN score ON
+
+score.stateCode = schoolscores.staeCode
+
+INNER JOIN years ON
+
+years.yearId = score.yearsId AND
+
+years.year = schoolscores.year
+
+SET subject_averages.scoreId = score.scoreId
+
+WHERE subid=1;
+
+...
+
+--------------------------------------------------------------------------
+
+CREATE TABLE score(
+
+scoreId int(3) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+
+stateCode char(2),
+
+yearsId int(2),
+
+AveMath int(3),
+
+AveVerbal int(3),
+
+TestTakers int(7),
+
+FOREIGN KEY (stateCode) REFERENCES states(stateCode),
+
+FOREIGN KEY (yearsId) REFERENCES years(yearId)
+
+)
+
+INSERT INTO score(AveMath, AveVerbal, TestTakers)
+
+SELECT schoolscores.AveMath, schoolscores.AveVerbal, schoolscores.TestTakers
+
+FROM schoolscores
+
+================================================================
+
+UPDATE score
+
+INNER JOIN schoolscores ON score.AveMath=schoolscores.AveMath AND score.AveVerbal = schoolscores.AveVerbal AND schoolscores.TestTakers = score.TestTakers
+
+INNER JOIN states ON states.stateCode=schoolscores.staeCode AND states.state = schoolscores.state
+
+SET score.stateCode = states.stateCode
+
+UPDATE score
+
+INNER JOIN schoolscores ON score.AveMath=schoolscores.AveMath AND
+
+score.AveVerbal = schoolscores.AveVerbal AND
+
+schoolscores.TestTakers = score.TestTakers
+
+INNER JOIN years ON years.year=schoolscores.year
+
+SET score.yearsId = years.yearId
