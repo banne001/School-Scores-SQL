@@ -1,6 +1,8 @@
 # School-Scores-SQL
 Project for Database fundamentals. 
-Object: re-organize a real life data. Create questions that is able to be answered by writing an sql command
+
+Objective: 
+re-organize a real life data. Create questions that is able to be answered by writing an sql command
 
 Analysis
 
