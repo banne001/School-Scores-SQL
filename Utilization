@@ -1,0 +1,171 @@
+Display the years, states, and Average Math scores of states that contain the word “New” and has an Average Math score between 525-550. And ordered from least to greatest.
+
+SELECT states.state, score.AveMath, years.year
+
+FROM score, states, years
+
+WHERE states.stateCode = score.stateCode
+
+AND score.yearsId = years.yearId
+
+AND state LIKE "%New%"
+
+AND AveMath BETWEEN 525 AND 550
+
+ORDER BY `score`.`AveMath` ASC
+
+2. Display the top 5 Average Verbal scores, year, and GPA of Texas with a GPA of “A+”, “A-”, or “A.”
+
+SELECT years.year, gpa_scores.score, gpas.gpa
+
+FROM years, score, gpa_scores, states, gpas, types
+
+WHERE years.yearId = score.yearsId
+
+AND gpa_scores.scoreId = score.scoreId
+
+AND states.stateCode = score.stateCode
+
+AND gpas.gpaid = gpa_scores.gpaid
+
+AND types.typeId = gpa_scores.typeId
+
+AND state = "Texas"
+
+AND gpas.gpa IN ("A+","A","A-")
+
+AND type = "Verbal"
+
+ORDER BY `gpa_scores`.`score` DESC
+
+LIMIT 5
+
+3. Show the States and average female math scores that are more than the average math score of males in all states on 2010.
+
+SELECT state, gender_scores.score, gender_scores.typeId
+
+FROM `gender_scores`, years, score, types, states
+
+WHERE gender_scores.scoreId = score.scoreId
+
+AND years.yearId = score.yearsId
+
+AND types.typeId = gender_scores.typeId
+
+AND states.stateCode = score.stateCode
+
+AND year = "2010"
+
+AND gender = "female"
+
+AND type = "Math"
+
+AND score > (
+
+SELECT AVG(score)
+
+FROM `gender_scores`, years, score, types, states
+
+WHERE gender_scores.scoreId = score.scoreId
+
+AND years.yearId = score.yearsId
+
+AND types.typeId = gender_scores.typeId
+
+AND states.stateCode = score.stateCode
+
+AND gender = "male"
+
+AND types.type = "Math"
+
+AND year = "2010"
+
+)
+
+4. What Family income range has the most test takers in California on 2010.
+
+SELECT family_income_range.min, family_income_range.max, score
+
+FROM `Fam_income_scores`, family_income_range
+
+WHERE Fam_income_scores.fiid = family_income_range.fiid
+
+AND score = (
+
+SELECT MAX(Fam_income_scores.score)
+
+FROM `Fam_income_scores`, years, score, types, states
+
+WHERE Fam_income_scores.scoreId = score.scoreId
+
+AND years.yearId = score.yearsId
+
+AND types.typeId = Fam_income_scores.typeId
+
+AND states.stateCode = score.stateCode
+
+AND state = "california"
+
+AND year = "2010"
+
+)
+
+5. Show the state, average gpa, average verbal score for the highest average GPA in the subject of “Natual Science” for each year.
+
+SELECT state, year, aveGPA, score.AveVerbal
+
+FROM subject_averages, years, score, subjects, states
+
+WHERE subject_averages.scoreId = score.scoreId
+
+AND years.yearId = score.yearsId
+
+AND states.stateCode = score.stateCode
+
+AND subjects.subid = subject_averages.subid
+
+AND (year, aveGPA, subject) IN (
+
+SELECT year, MAX(aveGPA), subjects.subject
+
+FROM subject_averages, years, score, subjects
+
+WHERE subject_averages.scoreId = score.scoreId
+
+AND score.yearsId = years.yearId
+
+AND subject_averages.subid = subjects.subid
+
+AND subject = "Natural Science"
+
+GROUP BY year
+
+)
+
+GROUP BY year
+
+6. Show the Total number of male students that took the math test in each score range on 2013 that is greater than 100,000.
+
+SELECT score_range.min as 'Score Range From', score_range.max as 'To', SUM(students)
+
+FROM `score_range_students`, types, states, score, years, score_range
+
+WHERE types.typeId =score_range_students.typeid
+
+AND types.typeId = score.yearsId
+
+AND states.stateCode = score.stateCode
+
+AND score_range_students.scoreId = score.scoreId
+
+AND score_range.srid = score_range_students.srid
+
+AND gender = "male"
+
+AND types.type = "Math"
+
+AND year = 2013
+
+GROUP BY score_range.srid
+
+HAVING sum(students) > 100000
